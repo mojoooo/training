@@ -1,0 +1,62 @@
+package gui.mvp.training;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+public class Model
+{
+    private ObservableList<TrainingUnit> trainingUnitList;
+    
+    public ObservableList<TrainingUnit> getTrainingUnitList()
+    {
+        return this.trainingUnitList;
+    }
+    
+    public Model()
+    {
+        this.trainingUnitList = FXCollections.observableArrayList();
+    }
+    
+    public void addTrainingUnit(TrainingUnit unit)
+    {
+        for (TrainingUnit tUnit : this.trainingUnitList)
+        {
+            if (tUnit.getMarker() == unit.getMarker())
+            {
+                throw new IllegalArgumentException("Bezeichnung muss eindeutig sein!");
+            }
+        }
+        
+        this.trainingUnitList.add(unit);
+    }
+    
+    public void removeTrainingUnit(String marker)
+    {
+        this.trainingUnitList.remove(this.getTrainingUnit(marker));
+    }
+    
+    public TrainingUnit getTrainingUnit(String marker)
+    {
+        for (TrainingUnit unit : this.trainingUnitList)
+        {
+            if (unit.getMarker().equals(marker))
+            {
+                return unit;
+            }
+        }
+        
+        return null;
+    }
+    
+    public String[] getAllMarkers()
+    {
+        String[] allMarkers = new String[this.trainingUnitList.size()];
+        
+        for (int i = 0; i < this.trainingUnitList.size(); i++)
+        {
+            allMarkers[i] = this.trainingUnitList.get(i).getMarker();
+        }
+                
+        return allMarkers;
+    }
+}
