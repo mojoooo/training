@@ -19,8 +19,9 @@ public class Main extends Application
     public void start(Stage primaryStage) throws Exception
     {
         createTestData();
-        View view = new View(primaryStage, "traininglist.fxml", "Trainingseinheiten");
-        Presenter presenter = new Presenter(view, this.data);
+        Presenter presenter = new Presenter(this.data);
+        View view = new View(presenter, primaryStage, "traininglist.fxml", "Trainingseinheiten");
+        presenter.initView(view);
     }
     
     public void createTestData()

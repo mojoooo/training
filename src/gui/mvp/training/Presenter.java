@@ -1,36 +1,26 @@
 package gui.mvp.training;
 
 import java.io.IOException;
-
-import javafx.fxml.FXML;
+import java.util.ArrayList;
 
 public class Presenter
 {
-    private View view;
     private Model data;
+    private View view;
 
-    public Presenter(View view, Model data)
+    public Presenter(Model data)
     {
-        this.view = view;
         this.data = data;
-        
-        this.setAllActions();
     }
     
-    private void setAllActions()
+    public Model getData()
     {
-        this.view.getOverViewList().setItems(this.data.getTrainingUnitList());
-        this.view.getOverViewList().setOnMouseClicked(e -> showValues());
-        this.view.getAddTrainingUnitButton().setOnAction(e -> this.createDialog());
-        this.view.getDeleteTrainingUnitButton().setOnAction(e -> this.removeTrainingUnit());
+        return this.data;
     }
     
-    @FXML public void showValues()
+    public void initView(View vw)
     {
-        this.view.getMarkerLabel().setText(this.view.getOverViewList().getSelectionModel().getSelectedItem().getMarker());
-        this.view.getDistanceLabel().setText(Float.toString(this.view.getOverViewList().getSelectionModel().getSelectedItem().getDistance()));
-        this.view.getTimeLabel().setText(Float.toString(this.view.getOverViewList().getSelectionModel().getSelectedItem().getTime()));
-        this.view.getMeanSpeedLabel().setText(Float.toString(this.view.getOverViewList().getSelectionModel().getSelectedItem().getMeanSpeed()));
+        this.view = vw;
     }
     
     public void createDialog()
@@ -39,10 +29,10 @@ public class Presenter
         {
             EditorDialog modal = new EditorDialog();
             modal.getAdd().setOnAction(e -> handleDialogActions(modal));
+            modal.getCancel().setOnAction(e -> closeDialog(modal));
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } 
     }
@@ -57,16 +47,41 @@ public class Presenter
         
         this.data.addTrainingUnit(newUnit);
         
-        this.view.getOverViewList().getSelectionModel().select(newUnit);
+        //this.view.getOverViewList().getSelectionModel().select(newUnit);
+        
+        modal.close();
+    }
+    
+    public void closeDialog(EditorDialog modal)
+    {
+        modal.close();
     }
     
     public void removeTrainingUnit()
     {
-        this.data.removeTrainingUnit(this.view.getOverViewList().getSelectionModel().getSelectedItem().toString());
+        String selectedItem = this.view.getOverViewList().getSelectionModel().getSelectedItem();
+        if (selectedItem != null && !selectedItem.equals(""))
+        {
+            this.data.removeTrainingUnit(selectedItem); 
+            this.view.getOverViewList().getItems().remove(selectedItem);
+        }
+        
         if (!this.data.getTrainingUnitList().isEmpty())
         {
             this.view.getOverViewList().getSelectionModel().select(0);
             this.view.getOverViewList().getFocusModel().focus(0);
         }
     }
+    /*
+    public ArrayList<String> setMarkers()
+    {
+        ArrayList<String> list = new ArrayList<String>();
+        
+        for (String marker : this.data.getAllMarkers())
+        {
+            list.add(marker);
+        }
+        return list;
+    }
+    */
 }
