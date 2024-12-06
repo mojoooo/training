@@ -71,6 +71,8 @@ public class Presenter
             this.view.getOverViewList().getSelectionModel().select(0);
             this.view.getOverViewList().getFocusModel().focus(0);
         }
+        
+        this.view.showValues();
     }
     /*
     public ArrayList<String> setMarkers()

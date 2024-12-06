@@ -96,10 +96,26 @@ public class View
         this.getOverViewList().setOnMouseClicked(e -> this.showValues());
     }
     
+    public void clearValues()
+    {
+        this.getMarkerLabel().setText("");
+        this.getDistanceLabel().setText("");
+        this.getTimeLabel().setText("");
+        this.getMeanSpeedLabel().setText("");
+    }
+    
     public void showValues()
     {
         String selectedItem = this.getOverViewList().getSelectionModel().getSelectedItem();
-        if (selectedItem != null && !selectedItem.equals(""))
+        
+        this.clearValues();
+        
+        if (selectedItem == null)
+        {
+            return;
+        }
+        
+        if (!selectedItem.equals(""))
         {
             this.getMarkerLabel().setText(this.presenter.getData().getTrainingUnit(selectedItem).getMarker());
             this.getDistanceLabel().setText(Float.toString(this.presenter.getData().getTrainingUnit(selectedItem).getDistance()));
