@@ -2,9 +2,6 @@ package gui.mvp.training;
 
 import java.util.ArrayList;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 public class Model
 {
     private ArrayList<TrainingUnit> trainingUnitList;

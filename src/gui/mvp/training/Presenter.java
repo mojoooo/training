@@ -1,7 +1,8 @@
 package gui.mvp.training;
 
 import java.io.IOException;
-import java.util.ArrayList;
+
+import javafx.application.Platform;
 
 public class Presenter
 {
@@ -30,6 +31,7 @@ public class Presenter
             EditorDialog modal = new EditorDialog();
             modal.getAdd().setOnAction(e -> handleDialogActions(modal));
             modal.getCancel().setOnAction(e -> closeDialog(modal));
+            this.setTextfieldListener(modal);
         }
         catch (IOException e)
         {
@@ -37,19 +39,116 @@ public class Presenter
         } 
     }
     
+    public void setTextfieldListener(EditorDialog modal)
+    {
+        modal.getMarkerTF().textProperty().addListener((observable, oldValue, newValue) -> 
+        {
+            this.clearErrMsg(modal);
+            
+            if (newValue.equals(" "))
+            {
+
+                Platform.runLater(() ->  modal.getErrMsgLabel().setText("Kennung: ungültige Eingabe"));
+            }
+            
+            if (this.data.getTrainingUnit(newValue) != null)
+            {
+
+                Platform.runLater(() -> modal.getErrMsgLabel().setText("Kennung: existiert schon"));
+            }
+        });
+        
+        modal.getDistanceTF().textProperty().addListener((observable, oldValue, newValue) -> 
+        {
+            this.clearErrMsg(modal);
+
+            Float distance = null;
+
+            try
+            {
+                distance = Float.parseFloat(modal.getDistanceTF().getText());
+            }
+            catch (Exception e)
+            {
+
+            }
+            
+            if (distance == null)
+            {
+                Platform.runLater(() -> modal.getErrMsgLabel().setText("Entfernung: ungültige Eingabe"));
+            }
+            
+        });
+        
+        modal.getTimeTF().textProperty().addListener((observable, oldValue, newValue) -> 
+        {
+            this.clearErrMsg(modal);
+            
+            Float time = null;
+
+            try
+            {
+                time = Float.parseFloat(modal.getTimeTF().getText());
+            }
+            catch (Exception e)
+            {
+
+            }
+            
+            if (time == null)
+            {
+                Platform.runLater(() -> modal.getErrMsgLabel().setText("Zeit: ungültige Eingabe"));
+            }
+        });
+    }
+    
+    public void clearErrMsg(EditorDialog modal)
+    {
+        Platform.runLater(() -> modal.getErrMsgLabel().setText(""));
+    }
+    
     public void handleDialogActions(EditorDialog modal)
     {
         String marker = modal.getMarkerTF().getText();
-        float distance = Float.parseFloat(modal.getDistanceTF().getText());
-        float time = Float.parseFloat(modal.getTimeTF().getText());
         
-        TrainingUnit newUnit = new TrainingUnit(marker, distance, time);
+        if (this.data.getTrainingUnit(marker) != null)
+        {            
+            Platform.runLater(() -> modal.getErrMsgLabel().setText("Kennung: existiert schon"));
+            return;
+        }
         
-        this.data.addTrainingUnit(newUnit);
+        if (marker.equals(""))
+        {
+            Platform.runLater(() -> modal.getErrMsgLabel().setText("Kennung: ungültige Eingabe"));
+            
+            return;
+        }
+                       
+        Float distance = null;
+        Float time = null;
+
+        try
+        {
+            distance = Float.parseFloat(modal.getDistanceTF().getText());
+            time = Float.parseFloat(modal.getTimeTF().getText());
+        }
+        catch (Exception e)
+        {
+
+        }
         
-        //this.view.getOverViewList().getSelectionModel().select(newUnit);
-        
-        modal.close();
+        if (marker != null && distance != null && time != null)
+        {
+            TrainingUnit newUnit = new TrainingUnit(marker, distance, time);
+            
+            this.data.addTrainingUnit(newUnit);
+            
+            this.view.getOverViewList().getItems().add(newUnit.getMarker());
+            this.view.getOverViewList().getSelectionModel().select(newUnit.getMarker());
+            this.view.showValues();
+            
+            modal.close();   
+        }
     }
     
     public void closeDialog(EditorDialog modal)
@@ -74,16 +173,4 @@ public class Presenter
         
         this.view.showValues();
     }
-    /*
-    public ArrayList<String> setMarkers()
-    {
-        ArrayList<String> list = new ArrayList<String>();
-        
-        for (String marker : this.data.getAllMarkers())
-        {
-            list.add(marker);
-        }
-        return list;
-    }
-    */
 }
